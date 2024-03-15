@@ -1,6 +1,8 @@
 import {Component} from 'react'
 import Loader from 'react-loader-spinner'
 import Cookies from 'js-cookie'
+import {BsPlusSquare} from 'react-icons/bs'
+import {BsDashSquare} from 'react-icons/bs'
 
 import SimilarProductItem from '../SimilarProductItem'
 import Header from '../Header'
@@ -8,7 +10,12 @@ import Header from '../Header'
 import './index.css'
 
 class ProductItemDetails extends Component {
-  state = {productDetails: {}, similarProducts: [], isLoading: true}
+  state = {
+    productDetails: {},
+    similarProducts: [],
+    isLoading: true,
+    productQuantity: 1,
+  }
 
   componentDidMount() {
     this.getProductDetials()
@@ -59,7 +66,6 @@ class ProductItemDetails extends Component {
 
   renderSimilarProductItem = () => {
     const {similarProducts} = this.state
-    console.log(similarProducts)
     return (
       <div className="similar-products-container">
         <h1 className="similar-product-heading">Similar Products</h1>
@@ -86,7 +92,7 @@ class ProductItemDetails extends Component {
       <img
         className="failure-view-img"
         src="https://assets.ccbp.in/frontend/react-js/nxt-trendz-error-view-img.png"
-        alt="error view"
+        alt="failure view"
       />
       <h1 className="failure-view-heading">Product Not Found</h1>
       <button
@@ -99,9 +105,23 @@ class ProductItemDetails extends Component {
     </div>
   )
 
-  renderProductsItemDetails = () => {
-    const {productDetails} = this.state
+  onClickIncrement = () => {
+    this.setState(prevState => ({
+      productQuantity: prevState.productQuantity + 1,
+    }))
+  }
 
+  onClickDecrement = () => {
+    const {productQuantity} = this.state
+    if (productQuantity > 1) {
+      this.setState(prevState => ({
+        productQuantity: prevState.productQuantity - 1,
+      }))
+    }
+  }
+
+  renderProductsItemDetails = () => {
+    const {productDetails, productQuantity} = this.state
     if (productDetails === undefined) {
       return this.renderFailureView()
     }
@@ -119,10 +139,10 @@ class ProductItemDetails extends Component {
     return (
       <div className="item-details-card">
         <div className="item-details-img-card">
-          <img className="item-details-img" src={imageUrl} alt={title} />
+          <img className="item-details-img" src={imageUrl} alt="product" />
         </div>
         <div className="item-details-content-card">
-          <p className="item-details-heading">{title}</p>
+          <h1 className="item-details-heading">{title}</h1>
           <p className="item-details-price">{`Rs ${price}/-`}</p>
           <div className="item-details-rating-reviews-card">
             <div className="item-details-rating-card">
@@ -137,25 +157,30 @@ class ProductItemDetails extends Component {
           </div>
           <p className="item-details-description">{description}</p>
           <p className="item-details-available">
-            Available: <span className="item-details-span">{availability}</span>
+            <span className="item-details-span">Available:</span> {availability}
           </p>
           <p className="item-details-available">
-            Brand: <span className="item-details-span">{brand}</span>
+            <span className="item-details-span">Brand: </span>
+            {brand}
           </p>
           <hr className="item-details-line" />
           <div className="item-details-increase-decrease-card">
             <button
+              testid="minus"
               className="item-details-increase-decrease-btn"
               type="button"
+              onClick={this.onClickDecrement}
             >
-              -
+              <BsDashSquare />
             </button>
-            <p>1</p>
+            <p>{productQuantity}</p>
             <button
+              testid="plus"
               className="item-details-increase-decrease-btn"
               type="button"
+              onClick={this.onClickIncrement}
             >
-              +
+              <BsPlusSquare />
             </button>
           </div>
           <button className="item-detail-add-to-cart-btn" type="button">
@@ -168,7 +193,7 @@ class ProductItemDetails extends Component {
   }
 
   renderLoadingView = () => (
-    <div className="similar-product-loader-container">
+    <div data-testid="loader" className="similar-product-loader-container">
       <Loader type="ThreeDots" color="#0b69ff" height="50" width="50" />
     </div>
   )
